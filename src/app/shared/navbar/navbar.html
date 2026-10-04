@@ -1,0 +1,44 @@
+<nav class="relative z-30 flex items-center gap-9 px-[60px] py-[40px]">
+  <a routerLink="/" class="text-xl font-extrabold tracking-wide">
+    KINO <span class="text-[#EC3013]">XII</span>
+  </a>
+
+  <a routerLink="/sessions" class="text-xs font-semibold tracking-widest">
+    SESSIONS
+  </a>
+
+  <div class="group relative ml-auto w-[380px] transition-[width] duration-200 focus-within:w-[520px]">
+    <label class="flex h-[42px] w-full items-center gap-2 rounded-full border border-transparent bg-white/10 px-3 backdrop-blur-md focus-within:border-white/10">
+      <img src="MagnifyingGlass.png" alt=""/>
+      <input
+        type="search"
+        placeholder="Search films and live events"
+        class="w-full bg-transparent text-sm text-white outline-none placeholder:text-white focus:placeholder:text-white/50"
+      />
+    </label>
+
+    <div class="absolute left-0 top-full mt-2 hidden w-full flex-col items-center rounded-2xl border border-[#2A2C3D] bg-bg px-6 py-10 group-focus-within:flex">        
+        <div class="mb-5 flex h-12 w-12 rounded-full items-center justify-center bg-white/10">
+            <img src="boxicons_popcorn.png" alt=""/>
+        </div>
+        <p class="mb-1.5 text-sm font-semibold text-white">What do you want to watch?</p>
+        <p class="text-sm text-[#A9A9A9]">Search by title, director or cast</p>
+        <a
+            routerLink="/sessions"
+            (click)="$any($event.currentTarget).blur()"
+            class="mt-[22px] rounded-full bg-white/10 px-6 py-2.5 text-sm font-extrabold text-white transition-colors duration-300 hover:bg-white/20"        >
+        Browse all sessions
+      </a>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <button type="button" class="bg-[#EC3013] px-[22px] py-[12px] rounded-full font-extrabold text-sm text-white leading-none cursor-pointer">
+        Sign up
+    </button>
+
+    <button type="button" class="bg-white px-[22px] py-[12px] rounded-full font-extrabold text-sm text-bg leading-none cursor-pointer">
+        Log in
+    </button>
+  </div>
+</nav>
