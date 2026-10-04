@@ -1,0 +1,1 @@
+export const API_URL = 'https://api.kinoxii.redberryinternship.ge/api';
