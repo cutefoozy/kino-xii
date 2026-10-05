@@ -1,0 +1,93 @@
+<section class="px-[68px] py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-2xl font-extrabold">NOW PLAYING</h2>
+    <a routerLink="/sessions" class="text-sm font-semibold text-[#EC3013]">See all</a>
+  </div>
+
+  <div class="relative">
+    <div 
+      class="pointer-events-none absolute -left-[68px] top-0 bottom-0 w-28 bg-gradient-to-r from-[#0A0E17] via-[#0A0E17]/80 to-transparent z-10 transition-opacity duration-300"
+      [class.opacity-0]="!canScrollLeft()"
+    ></div>
+
+    <div 
+      class="pointer-events-none absolute -right-[68px] top-0 bottom-0 w-[280px] bg-gradient-to-l from-[#0A0E17] via-[#0A0E17]/85 via-45% to-transparent z-10 transition-opacity duration-300"
+      [class.opacity-0]="!canScrollRight()"
+    ></div>
+
+    <div 
+      #carousel 
+      (scroll)="onScroll(carousel)"
+      class="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+    >
+      @for (m of movies(); track m.id) {
+        <article 
+          class="group flex w-[260px] shrink-0 flex-col rounded-[14px] bg-[#1E2031] p-3 transition-all duration-500 ease-in-out hover:w-[390px]"
+        >
+          <div class="relative h-[300px] w-[full] rounded-[14px] transition-all duration-500 ease-in-out group-hover:h-[236px]">
+            <img 
+              [src]="m.posterUrl" 
+              [alt]="m.title" 
+              class="absolute inset-0 h-full w-full rounded-[14px] object-cover transition-opacity duration-300 group-hover:opacity-0" 
+            />
+            <img 
+              [src]="m.backdropUrl" 
+              [alt]="m.title" 
+              class="absolute inset-0 h-full w-full rounded-[14px] object-cover opacity-0 transition-opacity duration-400 group-hover:opacity-100" 
+            />
+          </div>
+
+          <div class="mt-[10px] flex flex-1 flex-col">
+            <h3 class="truncate text-lg font-extrabold text-white" [title]="m.title">
+              {{ m.title }}
+            </h3>
+            
+            <p class="mt-[6px] text-xs text-[#A9A9A9]">
+              {{ m.genres[0]?.name }} · {{ m.runtimeMinutes }} min
+            </p>
+
+            <span class="mt-[6px] w-fit rounded-full bg-[#EC3013]/10 px-2 py-1 text-xs font-bold text-[#EC3013]">
+              {{ m.ageRating.code }}
+            </span>
+
+            <div class="grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-in-out group-hover:mt-[10px] group-hover:grid-rows-[1fr] group-hover:opacity-100">
+              <p class="overflow-hidden text-xs leading-snug text-white/70 line-clamp-4">
+                {{ m.synopsis }}
+              </p>
+            </div>
+
+            <div class="mt-auto flex items-center justify-between pt-3">
+              <span class="text-xs font-semibold text-white">From ₾{{ m.fromPrice }}</span>
+              <a 
+                [routerLink]="['/movies', m.id]" 
+                class="rounded-full bg-[#EC3013] px-[22px] py-[10px] text-sm font-extrabold text-white"
+              >
+                Buy Ticket
+              </a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="absolute -left-5 top-1/2 -translate-y-1/2 z-10 flex h-[48px] w-[48px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
+      [class.opacity-0]="!canScrollLeft()"
+      [class.pointer-events-none]="!canScrollLeft()"
+      (click)="scroll(carousel, 'left')"
+    >
+      <img src="Arrow-Left.svg" alt="" class="h-[14px] w-[7px]">
+    </button>
+
+    <button
+      type="button"
+      class="absolute -right-5 top-1/2 -translate-y-1/2 z-10 flex h-[48px] w-[48px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
+      [class.opacity-0]="!canScrollRight()"
+      [class.pointer-events-none]="!canScrollRight()"
+      (click)="scroll(carousel, 'right')"
+    >
+      <img src="Arrow-Right.svg" alt="" class="h-[14px] w-[7px]">
+    </button>
+  </div>
+</section>
