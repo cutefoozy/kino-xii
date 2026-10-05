@@ -1,0 +1,70 @@
+<section class="relative h-[760px] overflow-hidden">
+  @for (m of movies(); track m.id; let i = $index) {
+    <div
+      class="absolute inset-0 transition-opacity duration-700 ease-in-out"
+      [class]="i === current() ? 'opacity-100' : 'pointer-events-none opacity-0'"
+      [attr.inert]="i === current() ? null : ''"
+    >
+      <img [src]="m.backdropUrl" class="absolute inset-0 h-full w-full object-cover" />
+      <div class="absolute inset-0 bg-linear-to-r from-bg/80 to-transparent"></div>
+
+      <div class="relative flex h-full flex-col justify-end px-[68px] pb-[180px]">
+        <span class="mb-[14px] w-fit rounded-full bg-[#EC3013]/10 px-[10px] py-[6px] text-xs font-semibold uppercase text-[#EC3013]">
+          PREMIERE · WEEK OF {{ m.releaseDate | date: 'd MMM' }}
+        </span>
+        <h1 class="mb-[14px] text-[40px] font-extrabold leading-none">{{ m.title }}</h1>
+
+        <div class="mb-4 flex items-center gap-2 text-xs font-semibold">
+          <span class="rounded-full bg-[#EC3013]/20 px-3 py-[6px] text-[#EC3013]">{{ m.ageRating.code }}</span>
+          <span class="rounded-full bg-white/10 px-3 py-[6px]">{{ m.runtimeMinutes }} Min</span>
+          @for (f of m.formats; track f.id) {
+            <span class="rounded-full bg-white/10 px-3 py-[6px] uppercase">{{ f.name }}</span>
+          }
+        </div>
+
+        <p class="mb-[20px] max-w-[560px] text-sm leading-snug text-white">{{ m.synopsis }}</p>
+
+        <div class="flex gap-[10px]">
+          <a [routerLink]="['/movies', m.id]" class="flex gap-1 h-[42px] items-center rounded-full bg-[#EC3013] px-6 text-sm font-extrabold">
+            <img src="Ticket.svg" alt="">
+            Buy tickets
+          </a>
+          <a routerLink="/sessions" class="flex h-[42px] items-center rounded-full bg-white/10 px-6 text-sm font-extrabold backdrop-blur-md">
+            All sessions
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="absolute inset-x-[68px] bottom-[68px] flex items-center gap-5">
+    <div class="flex flex-1 gap-2">
+      @for (s of movies(); track s.id; let i = $index) {
+        <div class="flex-1 py-2">
+          <div
+            class="h-[3px] w-full rounded-full transition-colors duration-300"
+            [class]="i === current() ? 'bg-[#EC3013]' : 'bg-white'"
+          ></div>
+        </div>
+      }
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        type="button"
+        class="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md"
+        (click)="prev()"
+      >
+        <img src="Arrow-Left.svg" alt="" class="h-[16px] w-[8px]">
+      </button>
+      <button
+        type="button"
+        class="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md"
+        (click)="next()"
+      >
+        <img src="Arrow-Right.svg" alt="" class="h-[16px] w-[8px]">
+      </button>
+    </div>
+
+  </div>
+</section>
