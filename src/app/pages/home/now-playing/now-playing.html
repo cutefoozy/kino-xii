@@ -18,13 +18,13 @@
     <div 
       #carousel 
       (scroll)="onScroll(carousel)"
-      class="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      class="flex gap-4 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
     >
       @for (m of movies(); track m.id) {
         <article 
           class="group flex w-[260px] shrink-0 flex-col rounded-[14px] bg-[#1E2031] p-3 transition-all duration-500 ease-in-out hover:w-[390px]"
         >
-          <div class="relative h-[300px] w-[full] rounded-[14px] transition-all duration-500 ease-in-out group-hover:h-[236px]">
+          <div class="relative h-[300px] w-full rounded-[14px] transition-all duration-500 ease-in-out group-hover:h-[236px]">
             <img 
               [src]="m.posterUrl" 
               [alt]="m.title" 
@@ -72,7 +72,7 @@
 
     <button
       type="button"
-      class="absolute -left-5 top-1/2 -translate-y-1/2 z-10 flex h-[48px] w-[48px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
+      class="absolute -left-5 top-1/2 -translate-y-1/2 z-10 flex h-[42px] w-[42px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
       [class.opacity-0]="!canScrollLeft()"
       [class.pointer-events-none]="!canScrollLeft()"
       (click)="scroll(carousel, 'left')"
@@ -82,7 +82,7 @@
 
     <button
       type="button"
-      class="absolute -right-5 top-1/2 -translate-y-1/2 z-10 flex h-[48px] w-[48px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
+      class="absolute -right-5 top-1/2 -translate-y-1/2 z-10 flex h-[42px] w-[42px] cursor-pointer items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/5 transition-all duration-400"
       [class.opacity-0]="!canScrollRight()"
       [class.pointer-events-none]="!canScrollRight()"
       (click)="scroll(carousel, 'right')"
