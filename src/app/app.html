@@ -1,2 +1,15 @@
 <app-navbar />
 <router-outlet />
+
+@if (modal.active(); as activeModal) {
+  <app-modal-shell (closed)="modal.close()">
+    @if (activeModal === 'login') {
+      <app-login-modal />
+    }
+    @if (activeModal === 'register') {
+      <app-register-modal />
+    }
+  </app-modal-shell>
+}
+
+<app-footer />
