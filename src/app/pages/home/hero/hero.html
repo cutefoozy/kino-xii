@@ -6,7 +6,11 @@
       [attr.inert]="i === current() ? null : ''"
     >
       <img [src]="m.backdropUrl" class="absolute inset-0 h-full w-full object-cover" />
-      <div class="absolute inset-0 bg-linear-to-r from-bg/80 to-transparent"></div>
+
+      <div class="absolute inset-0 bg-black/40"></div>
+      <div class="absolute inset-0 bg-linear-to-r from-bg/90 via-bg/40 to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-t from-bg via-bg/70 to-transparent"></div>
+      <div class="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-bg/70 to-transparent"></div>
 
       <div class="relative flex h-full flex-col justify-end px-[68px] pb-[180px]">
         <span class="mb-[14px] w-fit rounded-full bg-[#EC3013]/10 px-[10px] py-[6px] text-xs font-semibold uppercase text-[#EC3013]">
