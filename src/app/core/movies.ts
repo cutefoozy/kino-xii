@@ -17,4 +17,8 @@ export class MoviesService {
   comingSoon() {
     return this.api.get<ApiResponse<Movie[]>>('/movies/coming-soon');
   }
+
+  search(query: string) {
+    return this.api.get<ApiResponse<Movie[]>>(`/search?q=${encodeURIComponent(query)}`);
+  }
 }

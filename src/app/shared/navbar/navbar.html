@@ -11,33 +11,123 @@
     <label class="flex h-[42px] w-full items-center gap-2 rounded-full border border-transparent bg-white/10 px-3 backdrop-blur-md focus-within:border-white/10">
       <img src="Search.svg" alt=""/>
       <input
-        type="search"
+        #searchInput
+        type="text"
+        autocomplete="off"
         placeholder="Search films and live events"
+        (input)="onSearchInput($event)"
+        (focus)="menuOpen.set(false)"
         class="w-full bg-transparent text-sm text-white outline-none placeholder:text-white focus:placeholder:text-white/50"
       />
+      @if (query()) {
+        <button
+          type="button"
+          aria-label="Clear search"
+          (click)="clearSearch()"
+          class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#FFFFFF]/10"
+        >
+          <img src="X.svg" alt="" class="h-4 w-4"/>
+        </button>
+      }
     </label>
 
-    <div class="absolute left-0 top-full mt-2 hidden w-full flex-col items-center rounded-2xl border border-[#2A2C3D] bg-bg px-6 py-10 group-focus-within:flex">
-      <div class="mb-5 flex h-12 w-12 rounded-full items-center justify-center bg-white/10">
-        <img src="Popcorn.svg" alt=""/>
-      </div>
-      <p class="mb-1.5 text-sm font-semibold text-white">What do you want to watch?</p>
-      <p class="text-sm text-[#A9A9A9]">Search by title, director or cast</p>
-      <a
-        routerLink="/sessions"
-        (click)="$any($event.currentTarget).blur()"
-        class="mt-[22px] rounded-full bg-white/10 px-6 py-2.5 text-sm font-extrabold text-white transition-colors duration-300 hover:bg-white/20"
-      >
-        Browse all sessions
-      </a>
+    <div
+      tabindex="-1"
+      class="absolute left-0 top-full mt-2 hidden max-h-[70vh] w-full overflow-y-auto rounded-2xl border border-[#2A2C3D] bg-bg outline-none group-focus-within:block"
+    >
+      @switch (searchState()) {
+        @case ('idle') {
+          <div class="flex flex-col items-center px-6 py-10">
+            <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+              <img src="Popcorn.svg" alt=""/>
+            </div>
+            <p class="mb-1.5 text-sm font-semibold text-white">What do you want to watch?</p>
+            <p class="text-sm text-[#A9A9A9]">Search by title, director or cast</p>
+            <a
+              routerLink="/sessions"
+              (click)="$any($event.currentTarget).blur()"
+              class="mt-[22px] rounded-full bg-white/10 px-6 py-2.5 text-sm font-extrabold text-white transition-colors duration-300 hover:bg-white/20"
+            >
+              Browse all sessions
+            </a>
+          </div>
+        }
+
+        @case ('loading') {
+          <div class="p-6">
+            <div class="mb-4 h-3 w-32 animate-pulse rounded bg-white/10"></div>
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div class="flex items-center gap-4 py-3">
+                <div class="h-14 w-10 animate-pulse rounded-md bg-white/10"></div>
+                <div class="flex-1 space-y-2">
+                  <div class="h-3 w-40 animate-pulse rounded bg-white/10"></div>
+                  <div class="h-3 w-28 animate-pulse rounded bg-white/10"></div>
+                </div>
+                <div class="h-3 w-14 animate-pulse rounded bg-white/10"></div>
+              </div>
+            }
+          </div>
+        }
+
+        @case ('results') {
+          <div class="p-6 pb-3">
+            <div class="mb-3 flex items-center justify-between text-xs">
+              <span class="font-semibold tracking-widest text-[#A9A9A9]">FILMS & EVENTS</span>
+              <span class="text-[#A9A9A9]">{{ results().length }} {{ results().length === 1 ? 'result' : 'results' }}</span>
+            </div>
+
+            @for (m of results(); track m.id) {
+              <a
+                [routerLink]="['/movies', m.slug]"
+                (click)="$any($event.currentTarget).blur()"
+                class="-mx-3 flex items-center gap-4 rounded-xl px-3 py-2.5 hover:bg-white/5"
+              >
+                <img [src]="m.posterUrl" alt="" loading="lazy" class="h-14 w-10 shrink-0 rounded-md object-cover" />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold">
+                    @for (p of titleParts(m.title); track $index) {
+                      <span [class]="p.match ? 'text-white' : 'text-[#A9A9A9]'">{{ p.text }}</span>
+                    }
+                  </p>
+                  <p class="text-xs text-[#A9A9A9]">
+                    {{ kindLabel(m.kind) }} · {{ m.ageRating.code }} · {{ m.runtimeMinutes }} min
+                  </p>
+                </div>
+                @if (m.isComingSoon) {
+                  <span class="text-sm font-semibold text-[#E27E04]">Coming Soon</span>
+                } @else if (m.fromPrice !== null) {
+                  <span class="text-sm font-semibold text-white">from ₾{{ m.fromPrice }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
+
+        @case ('empty') {
+          <div class="flex flex-col items-center px-6 py-10 text-center">
+            <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+              <img src="Search.svg" alt="" class="h-4 w-4">
+            </div>
+            <p class="mb-1.5 text-sm font-semibold text-white">No results for “{{ searchTerm() }}”</p>
+            <p class="text-sm text-[#A9A9A9]">Check the spelling or try another film or live event.</p>
+            <a
+              routerLink="/sessions"
+              (click)="$any($event.currentTarget).blur()"
+              class="mt-[22px] rounded-full bg-white/10 px-6 py-2.5 text-sm font-extrabold text-white transition-colors duration-300 hover:bg-white/20"
+            >
+              Browse all sessions
+            </a>
+          </div>
+        }
+      }
     </div>
   </div>
 
   @if (auth.user(); as user) {
-    <div class="relative">
+    <div #userMenu class="relative">
       <button
         type="button"
-        (click)="menuOpen.set(!menuOpen())"
+        (click)="toggleMenu()"
         class="flex cursor-pointer items-center gap-[10px]"
       >
         <span class="relative">
