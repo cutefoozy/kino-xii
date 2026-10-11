@@ -88,7 +88,7 @@ export class Sessions implements OnInit {
   }
 
   fetchSessions() {
-    this.requestSub?.unsubscribe(); // cancel the previous request
+    this.requestSub?.unsubscribe();
     this.loading.set(true);
     this.error.set(null);
 
@@ -104,14 +104,20 @@ export class Sessions implements OnInit {
 
     this.requestSub = this.sessionsService.list(query).subscribe({
       next: (res: SessionsResponse) => {
-        // page beyond the last page (e.g. old URL): go back to page 1
         const last = Math.max(res.meta.lastPage, 1);
         if (this.currentPage() > 1 && this.currentPage() > last) {
           this.currentPage.set(1);
           this.syncUrl(true);
           return;
         }
-        this.groups.set(res.data);
+
+        const now = new Date();
+        const activeData = res.data.map(group => ({
+          ...group,
+          sessions: group.sessions.filter(session => new Date(session.startsAt) > now)
+        })).filter(group => group.sessions.length > 0);
+
+        this.groups.set(activeData);
         this.meta.set(res.meta);
         this.loading.set(false);
       },

@@ -230,8 +230,7 @@
     </div>
 
     @if (activeSessionId(); as sessionId) {
-      <!-- Seat modal goes here next:
-           <app-seat-modal [sessionId]="sessionId" (closed)="closeSeatModal()" /> -->
+      <app-seat-modal [sessionId]="sessionId" (closed)="closeSeatModal()" />
     }
   }
 </main>

@@ -17,4 +17,8 @@ export class Api {
   put<T>(path: string, body: unknown) {
     return this.http.put<T>(`${API_URL}${path}`, body);
   }
+
+  delete<T>(path: string) {
+    return this.http.delete<T>(`${API_URL}${path}`);
+  }
 }

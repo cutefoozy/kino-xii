@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FilterOptions, Format, TimeBand } from '../../../core/models';
 import { toDateStr } from '../../../core/date-utils';
-import { CheckboxOption } from '../../../shared/checkbox-option/checkbox-option/checkbox-option';
+import { CheckboxOption } from '../../../shared/checkbox-option/checkbox-option';
 
 export interface DayOption {
   dateStr: string;

@@ -10,13 +10,14 @@ import { Hall, Movie, PreferredVenue, Session, VenueSessions } from '../../core/
 import { nextDays } from '../../core/date-utils';
 import { toErrorMessage } from '../../core/http-error';
 import { SessionTicket } from '../../shared/session-ticket/session-ticket';
+import { SeatModal } from '../../shared/seat-modal/seat-modal';
 
 interface HallGroup { hall: Hall; sessions: Session[]; }
 interface VenueGroup { venue: PreferredVenue; halls: HallGroup[]; }
 
 @Component({
   selector: 'app-movie-detail',
-  imports: [DatePipe, RouterLink, SessionTicket],
+  imports: [DatePipe, RouterLink, SessionTicket, SeatModal],
   templateUrl: './movie-detail.html',
 })
 export class MovieDetail implements OnInit {
@@ -50,7 +51,6 @@ export class MovieDetail implements OnInit {
 
   formatNames = computed(() => this.movie()?.formats.map((f) => f.name).join(', ') ?? '');
 
-  /** Signed-in user is younger than the film's minimum age: session buttons are disabled. */
   isAgeRestricted = computed(() => {
     const age = this.auth.user()?.age;
     const minAge = this.movie()?.ageRating.minAge;
@@ -68,7 +68,6 @@ export class MovieDetail implements OnInit {
       .map((vs) => ({ venue: vs.venue, halls: this.groupByHall(vs.sessions) })),
   );
 
-  /** Next day in the strip that has sessions, for the empty state's "way forward". */
   nextAvailableDate = computed(() => {
     const available = this.movie()?.availableDates ?? [];
     return this.days.map((d) => d.dateStr).find((d) => d > this.selectedDate() && available.includes(d)) ?? null;
@@ -116,13 +115,19 @@ export class MovieDetail implements OnInit {
   }
 
   loadSessions() {
-    this.sessionsSub?.unsubscribe(); // cancel the previous request
+    this.sessionsSub?.unsubscribe();
     this.sessionsLoading.set(true);
     this.sessionsError.set(null);
 
     this.sessionsSub = this.moviesService.sessions(this.slug(), this.selectedDate()).subscribe({
       next: (res) => {
-        this.sessions.set(res.data);
+        const now = new Date();
+        const activeData = res.data.map(vg => ({
+          ...vg,
+          sessions: vg.sessions.filter(session => new Date(session.startsAt) > now)
+        })).filter(vg => vg.sessions.length > 0);
+        
+        this.sessions.set(activeData);
         this.sessionsLoading.set(false);
       },
       error: (err: HttpErrorResponse) => {
@@ -171,9 +176,9 @@ export class MovieDetail implements OnInit {
       .notify(movie.slug)
       .pipe(finalize(() => this.notifying.set(false)))
       .subscribe({
-        next: (res) => this.notified.set(res.data.subscribed), // state comes from the server response
+        next: (res) => this.notified.set(res.data.subscribed),
         error: (err: HttpErrorResponse) => {
-          if (err.status === 401) return; // login modal + replay is handled globally
+          if (err.status === 401) return; 
           this.notifyError.set(err.error?.message ?? 'Could not save your request. Please try again.');
         },
       });
