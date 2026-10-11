@@ -1,0 +1,110 @@
+<aside class="w-full rounded-3xl bg-[#1E2031] p-6">
+  <h2 class="text-lg font-extrabold leading-6">Filters</h2>
+  @if (options(); as opts) {
+    <div class="mt-6">
+      <h3 class="text-xs font-semibold tracking-wider text-[#A9A9A9]">VENUE</h3>
+      <div class="mt-3 flex flex-col gap-3">
+        @for (venue of opts.venues; track venue.id) {
+          <app-checkbox-option
+            [checked]="selectedVenues().includes(venue.slug)"
+            (toggled)="venueToggled.emit(venue.slug)">
+            {{ venue.name }}
+            <span class="ml-1 text-xs font-normal text-[#A9A9A9]">· {{ venue.city }}</span>
+          </app-checkbox-option>
+        }
+      </div>
+    </div>
+
+    <div class="my-6 border-t border-[#2A2C3D]"></div>
+
+    <div>
+      <h3 class="text-xs font-semibold tracking-wider text-[#A9A9A9]">DATE</h3>
+      <div class="mt-3 flex gap-1.5 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
+        @for (day of days(); track day.dateStr) {
+          @let isSelected = selectedDate() === day.dateStr;
+          <button type="button" (click)="dateSelected.emit(day.dateStr)" [attr.aria-pressed]="isSelected"
+            class="flex h-13.5 w-9.25 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-[10px] text-xs transition-colors"
+            [class]="isSelected ? 'bg-[#EC3013] text-white' : 'bg-[#2A2C3D] text-white hover:bg-[#151622]'">
+            <span class="font-semibold leading-none">{{ day.dayName }}</span>
+            <span class="font-bold leading-none">{{ day.dayNumber }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="my-6 border-t border-[#2A2C3D]"></div>
+    
+    <div>
+      <h3 class="text-xs font-semibold tracking-wider text-[#A9A9A9]">FORMAT</h3>
+      <div class="mt-3 flex flex-col gap-3">
+        @for (format of visibleFormats(); track format.id) {
+          <app-checkbox-option
+            [checked]="selectedFormats().includes(format.slug)"
+            (toggled)="formatToggled.emit(format.slug)">
+            {{ format.name }}
+          </app-checkbox-option>
+        }
+      </div>
+    </div>
+
+    <div class="my-6 border-t border-[#2A2C3D]"></div>
+
+    <div>
+      <h3 class="text-xs font-semibold tracking-wider text-[#A9A9A9]">Language</h3>
+      <div class="mt-2.5 flex flex-col gap-3">
+        @for (lang of opts.languages || []; track lang.id) {
+          <app-checkbox-option
+            [checked]="selectedLanguages().includes(lang.slug)"
+            (toggled)="languageToggled.emit(lang.slug)">
+            {{ lang.name }}
+          </app-checkbox-option>
+        }
+      </div>
+    </div>
+
+    <div class="my-6 border-t border-[#2A2C3D]"></div>
+
+    <div>
+      <h3 class="text-xs font-semibold tracking-wider text-[#A9A9A9]">TIME OF DAY</h3>
+      <div class="mt-3 flex flex-col gap-3">
+        @for (band of opts.timeBands || []; track band.id) {
+          <app-checkbox-option
+            [checked]="selectedBands().includes(band.id)"
+            (toggled)="bandToggled.emit(band.id)">
+            {{ formatBandLabel(band.label) }}
+            @if (bandHint(band)) {
+              <span class="ml-1 text-xs font-normal text-[#A9A9A9]">· {{ bandHint(band) }}</span>
+            }
+          </app-checkbox-option>
+        }
+      </div>
+    </div>
+
+    <div class="my-6 border-t border-[#2A2C3D]"></div>
+
+    <div>
+      <button type="button" (click)="filtersCleared.emit()"
+        [disabled]="activeCount() === 0"
+        class="w-full cursor-pointer rounded-full bg-[#EC3013] px-4 py-2.5 text-center text-xs font-extrabold duration-500 text-white transition-colors hover:bg-[#505261]">
+        Clear filters
+      </button>
+      <p class="mt-4 text-center text-xs text-[#A9A9A9]">
+        {{ activeCount() }} {{ activeCount() === 1 ? 'filter' : 'filters' }} active
+      </p>
+    </div>
+  } @else if (error()) {
+    <div class="mt-6 text-center">
+      <p class="text-xs text-[#A9A9A9]">Couldn't load filters.</p>
+      <button type="button" (click)="retryClicked.emit()"
+        class="mt-3 rounded-full bg-[#EC3013] px-4 py-2 text-xs font-bold text-white hover:bg-[#d6270c]">
+        Retry
+      </button>
+    </div>
+  } @else {
+    <div class="mt-6 flex animate-pulse flex-col gap-3" aria-busy="true">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+        <div class="h-[18px] rounded bg-white/10"></div>
+      }
+    </div>
+  }
+</aside>

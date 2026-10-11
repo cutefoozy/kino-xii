@@ -1,0 +1,152 @@
+<div class="min-w-0">
+  <!-- Top bar -->
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+    <div aria-live="polite">
+      @if (loading()) {
+        <div class="h-5 w-36 animate-pulse rounded bg-white/10"></div>
+      } @else {
+        <p class="text-sm font-semibold text-white">
+          @if (meta() && meta()!.totalSessions > 0) {
+            Showing {{ meta()!.totalSessions }} {{ meta()!.totalSessions === 1 ? 'session' : 'sessions' }}
+          } @else {
+            No sessions found
+          }
+        </p>
+      }
+    </div>
+
+    <!-- Sort -->
+    <div class="relative z-20 pr-4">
+      <button type="button" (click)="sortOpen.set(!sortOpen())"
+        aria-haspopup="listbox" [attr.aria-expanded]="sortOpen()"
+        class="flex cursor-pointer items-center gap-2 text-sm font-extrabold">
+        <span class="text-[#A9A9A9]">Sort:</span>
+        <span class="text-white">{{ currentSortLabel() }}</span>
+        <img src="Arrow-Down.svg" alt="" class="h-4 w-4 transition-transform" [class.rotate-180]="sortOpen()" />
+      </button>
+
+      @if (sortOpen()) {
+        <div class="absolute right-4 top-full mt-2 w-56 rounded-xl border border-white/5 bg-[#1E2031] p-1.5 shadow-2xl">
+          @for (s of sortItems(); track s.id) {
+            <button type="button" (click)="sortSelected.emit(s.id); sortOpen.set(false)"
+              class="flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors"
+              [class]="selectedSort() === s.id ? 'bg-[#EC3013] font-semibold text-white' : 'text-white/80 hover:bg-white/5 hover:text-white'">
+              {{ s.label }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Loading skeletons -->
+  @if (loading()) {
+    <div class="flex flex-col" aria-busy="true">
+      @for (s of [1, 2, 3]; track s) {
+        <div class="animate-pulse border-b-2 border-[#2A2C3D] py-6 last:border-b-0">
+          <div class="flex items-center gap-4 pb-3.5">
+            <div class="h-20 w-14 shrink-0 rounded-lg bg-[#1E2031]"></div>
+            <div class="space-y-2.5">
+              <div class="h-5 w-48 rounded bg-[#1E2031]"></div>
+              <div class="h-4 w-20 rounded bg-[#1E2031]"></div>
+            </div>
+          </div>
+          <div class="flex gap-3 overflow-hidden">
+            @for (c of [1, 2, 3, 4, 5, 6]; track c) {
+              <div class="h-26 w-63 shrink-0 rounded-2xl bg-[#1E2031]"></div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading() && error()) {
+    <div class="flex flex-col items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center">
+      <h3 class="text-base font-bold text-white">Failed to load showtimes</h3>
+      <p class="mt-1 max-w-md text-xs text-[#A9A9A9]">{{ error() }}</p>
+      <button type="button" (click)="retryClicked.emit()"
+        class="mt-5 cursor-pointer rounded-full bg-[#EC3013] px-5 py-2 text-xs font-bold text-white hover:bg-[#d6270c]">
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading() && !error() && groups().length === 0) {
+    <div class="flex flex-col items-center justify-center rounded-2xl bg-[#1E2031] p-16 text-center">
+      <h3 class="text-base font-bold text-white">No sessions found</h3>
+      <p class="mt-1.5 max-w-sm text-xs text-[#A9A9A9]">
+        No showtimes match your current filter selections. Try another date or clear your filters.
+      </p>
+      <button type="button" (click)="clearFiltersClicked.emit()"
+        class="mt-6 cursor-pointer rounded-full border border-white/60 px-6 py-2.5 text-xs font-semibold text-white hover:bg-white/5">
+        Clear all filters
+      </button>
+    </div>
+  }
+
+  <!-- Movie groups -->
+  @if (!loading() && !error() && groups().length > 0) {
+    <div class="flex flex-col">
+      @for (group of groups(); track group.movie.id) {
+        <section class="border-b-2 border-[#2A2C3D] py-6 last:border-b-0">
+          <div class="flex items-center gap-4 pb-3.5">
+            <img [src]="group.movie.posterUrl" [alt]="group.movie.title + ' poster'" loading="lazy"
+              class="h-20 w-14 shrink-0 rounded-lg object-cover" />
+            <div>
+              <div class="flex items-center gap-3">
+                <h3 class="text-[18px] font-extrabold leading-6 text-white">{{ group.movie.title }}</h3>
+                <span class="rounded-md bg-[#EC3013]/10 px-2 py-1 text-xs font-semibold text-[#EC3013]">
+                  {{ group.movie.ageRating.code }}
+                </span>
+              </div>
+              <p class="mt-2.5 text-sm text-[#A9A9A9]">{{ group.movie.runtimeMinutes }} min</p>
+            </div>
+          </div>
+
+          <!-- One row per film, scrolls sideways -->
+          <div class="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin] [scrollbar-color:#2A2C3D_transparent]">
+            @for (session of group.sessions; track session.id) {
+              <app-session-card [session]="session" (selected)="sessionClicked.emit($event)" />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <!-- Pagination -->
+  @if (!loading() && !error() && meta() && meta()!.lastPage > 1) {
+    @let m = meta()!;
+    <nav class="mt-13 flex select-none items-center justify-center gap-2" aria-label="Pagination">
+      <button type="button" [disabled]="m.currentPage <= 1" (click)="pageSelected.emit(m.currentPage - 1)"
+        aria-label="Previous page"
+        class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#1E2031] transition-colors hover:bg-[#2A2C3D] disabled:cursor-not-allowed disabled:opacity-40">
+        <img src="Arrow-Left.svg" alt="" class="h-2.5 w-2.5" />
+      </button>
+
+      @for (p of visiblePages(m.currentPage, m.lastPage); track $index) {
+        @if (p === '…') {
+          <span class="flex h-10 w-10 items-center justify-center text-sm text-[#A9A9A9]" aria-hidden="true">...</span>
+        } @else {
+          <button type="button" (click)="pageSelected.emit(p)"
+            [attr.aria-current]="p === m.currentPage ? 'page' : null"
+            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm transition-colors"
+            [class]="p === m.currentPage
+              ? 'bg-[#EC3013] text-white'
+              : 'font-medium text-[#A9A9A9] hover:bg-[#1E2031] hover:text-white'">
+            {{ p }}
+          </button>
+        }
+      }
+
+      <button type="button" [disabled]="m.currentPage >= m.lastPage" (click)="pageSelected.emit(m.currentPage + 1)"
+        aria-label="Next page"
+        class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#1E2031] transition-colors hover:bg-[#2A2C3D] disabled:cursor-not-allowed disabled:opacity-40">
+        <img src="Arrow-Right.svg" alt="" class="h-2.5 w-2.5" />
+      </button>
+    </nav>
+  }
+</div>

@@ -1,0 +1,40 @@
+<main class="px-[50px] pt-28">
+  <div class="mb-9">
+    <h1 class="text-2xl font-extrabold">Sessions</h1>
+    <p class="mt-1 text-sm text-[#A9A9A9]">Browse showtimes across all venues</p>
+  </div>
+
+  <div class="flex items-start flex-row gap-[50px]">
+    <app-filters-sidebar
+      [options]="filterOptionsService.options()"
+      [loading]="filterOptionsService.loading()"
+      [error]="filterOptionsService.error()"
+      [selectedVenues]="selectedVenues()"
+      [selectedDate]="selectedDate()"
+      [selectedFormats]="selectedFormats()"
+      [selectedLanguages]="selectedLanguages()"
+      [selectedBands]="selectedBands()"
+      (venueToggled)="onToggleVenue($event)"
+      (dateSelected)="onSelectDate($event)"
+      (formatToggled)="onToggleFormat($event)"
+      (languageToggled)="onToggleLanguage($event)"
+      (bandToggled)="onToggleBand($event)"
+      (filtersCleared)="onClearFilters()"
+      (retryClicked)="filterOptionsService.load()"
+    />
+
+    <app-sessions-list
+      [groups]="groups()"
+      [meta]="meta()"
+      [loading]="loading()"
+      [error]="error()"
+      [selectedSort]="selectedSort()"
+      [sorts]="filterOptionsService.options()?.sorts ?? []"
+      (sortSelected)="onSelectSort($event)"
+      (pageSelected)="onSelectPage($event)"
+      (sessionClicked)="onSessionClicked($event)"
+      (retryClicked)="fetchSessions()"
+      (clearFiltersClicked)="onClearFilters()"
+    />
+  </div>
+</main>

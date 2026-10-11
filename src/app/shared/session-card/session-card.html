@@ -1,0 +1,36 @@
+@let s = session();
+
+<button type="button" [disabled]="isSoldOut()" (click)="selected.emit(s)"
+  class="flex h-full w-full flex-col gap-3 rounded-2xl bg-[#1E2031] p-4 text-left outline-none transition-all
+         enabled:cursor-pointer enabled:hover:bg-[#262940] enabled:active:scale-[0.98]
+         disabled:cursor-not-allowed disabled:opacity-40">
+
+  <div class="flex w-full items-center justify-between gap-2">
+    <span class="text-[18px] font-extrabold tabular-nums text-white">{{ time() }}</span>
+    <span class="truncate rounded-full bg-[#2A2C3D] px-2.5 py-1 text-xs font-semibold text-white">
+      {{ s.format.name }}
+    </span>
+  </div>
+
+  <div class="flex w-full items-center justify-between gap-2 text-xs">
+    <span class="min-w-0 truncate text-[#A9A9A9]">{{ s.language.name }}</span>
+    @if (isSoldOut()) {
+      <span class="shrink-0 text-[#A9A9A9]">Sold out</span>
+    } @else if (seatsLeft() !== null) {
+      <span class="flex shrink-0 items-center gap-1"
+        [class]="isLowSeats() ? 'text-[#EC3013]' : 'text-[#4ADE80]'">
+        <img [src]="isLowSeats() ? 'Ticket-Orange.svg' : 'Ticket-Green.svg'" alt="" class="h-4 w-4" />
+        {{ seatsLeft() }} left
+      </span>
+    }
+  </div>
+
+  <div class="flex w-full items-center justify-between gap-2">
+    <span class="min-w-0 truncate text-xs font-semibold text-white">
+      {{ s.venue.name }} · Hall {{ s.hall.name }}
+    </span>
+    @if (s.price != null) {
+      <span class="shrink-0 text-sm font-extrabold text-white">₾{{ s.price }}</span>
+    }
+  </div>
+</button>
