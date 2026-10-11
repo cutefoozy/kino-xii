@@ -1,36 +1,25 @@
-import { Component, HostListener, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, input, output, signal, computed } from '@angular/core';
 
 @Component({
   selector: 'app-modal-shell',
   standalone: true,
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm"
-      [class]="isClosing() ? 'animate-backdrop-out' : 'animate-backdrop-in'"
+      [class]="backdropClasses()"
       (mousedown)="onMouseDown($event)"
       (click)="onClick($event)"
     >
       <div
         role="dialog"
         aria-modal="true"
-        class="relative max-h-full w-full max-w-[475px] overflow-y-auto rounded-4xl border border-[#2A2C3D] bg-[#070C1C] p-8 text-white"
-        [class]="isClosing() ? 'animate-modal-out' : 'animate-modal-in'"
+        [class]="modalClasses()"
         (click)="$event.stopPropagation()"
       >
-        <button
-          type="button"
-          aria-label="Close"
-          class="absolute right-9 top-9 cursor-pointer transition-opacity hover:opacity-80"
-          (click)="requestClose()"
-        >
-          <img src="X.svg" alt=""/>
-        </button>
         <ng-content />
       </div>
     </div>
   `,
   styles: [`
-    /* Entrance */
     @keyframes backdropIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -46,7 +35,6 @@ import { Component, HostListener, OnDestroy, OnInit, output, signal } from '@ang
       }
     }
 
-    /* Exit */
     @keyframes backdropOut {
       from { opacity: 1; }
       to { opacity: 0; }
@@ -79,13 +67,26 @@ import { Component, HostListener, OnDestroy, OnInit, output, signal } from '@ang
 })
 export class ModalShell implements OnInit, OnDestroy {
   closed = output<void>();
+  
+  maxWidth = input('max-w-[475px]');
   isClosing = signal(false);
   private mouseDownOnBackdrop = false;
+
+  backdropClasses = computed(() => {
+    const base = 'fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm';
+    const anim = this.isClosing() ? 'animate-backdrop-out' : 'animate-backdrop-in';
+    return `${base} ${anim}`;
+  });
+
+  modalClasses = computed(() => {
+    const base = 'relative max-h-full w-full overflow-y-auto rounded-4xl border border-[#2A2C3D] bg-[#050B1A] p-8 text-white';
+    const anim = this.isClosing() ? 'animate-modal-out' : 'animate-modal-in';
+    return `${base} ${this.maxWidth()} ${anim}`;
+  });
 
   requestClose() {
     if (this.isClosing()) return;
     this.isClosing.set(true);
-    // Wait for the 140ms exit animation to complete before removing from DOM
     setTimeout(() => {
       this.closed.emit();
     }, 140);
