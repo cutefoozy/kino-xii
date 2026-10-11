@@ -154,7 +154,7 @@
       </button>
 
       @if (menuOpen()) {
-        <div class="absolute right-0 top-full z-40 mt-2 w-73 rounded-2xl bg-bg p-3.5 text-white animate-dropdown">
+        <div class="absolute right-0 top-full z-40 mt-2 w-73 rounded-2xl bg-[#1E2031] p-3.5 text-white animate-dropdown">
           <div class="flex items-center gap-[10px]">
             @if (user.avatar) {
               <img [src]="user.avatar" alt="" class="h-10 w-10 rounded-lg object-cover" />
@@ -190,7 +190,7 @@
             </a>
 
             <a
-              routerLink="/tickets"
+              routerLink="/profile"
               class="flex items-center gap-[10px] rounded-lg px-2 py-2 text-sm font-semibold hover:bg-white/5"
             >
               <img src="Ticket.svg" alt="" class="h-4 w-4" />
