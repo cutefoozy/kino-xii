@@ -141,7 +141,7 @@ export class Navbar {
   }
 
   toggleMenu() {
-    this.searchInput()?.nativeElement.blur(); // closes the search panel
+    this.searchInput()?.nativeElement.blur();
     this.menuOpen.set(!this.menuOpen());
   }
 

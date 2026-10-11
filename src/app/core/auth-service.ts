@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { finalize, tap } from 'rxjs';
 import { Api } from './api';
 import { ApiResponse, AuthData, User } from './models';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export const AUTH_PATHS = {
   register: '/register',
@@ -18,8 +19,10 @@ export class AuthService {
 
   readonly user = signal<User | null>(null);
   readonly isLoggedIn = computed(() => this.user() !== null);
+  readonly restoring = signal(false);
+  readonly restoreError = signal(false);
 
-  get token() {
+  get token() { 
     return localStorage.getItem(TOKEN_KEY);
   }
 
@@ -41,11 +44,23 @@ export class AuthService {
 
   restore() {
     if (!this.token) return;
-    this.api.get<ApiResponse<User>>(AUTH_PATHS.me).subscribe({
-      next: (res) => this.user.set(res.data),
-      error: () => this.clearSession(),
-    });
+    this.restoring.set(true);
+    this.restoreError.set(false);
+    this.api
+      .get<ApiResponse<User>>(AUTH_PATHS.me)
+      .pipe(finalize(() => this.restoring.set(false)))
+      .subscribe({
+        next: (res) => this.user.set(res.data),
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 401) this.clearSession();
+          else this.restoreError.set(true);
+        },
+      });
   }
+
+setUser(user: User) {
+  this.user.set(user);
+}
 
   clearSession() {
     localStorage.removeItem(TOKEN_KEY);

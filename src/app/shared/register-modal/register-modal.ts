@@ -136,6 +136,12 @@ export class RegisterModal implements OnDestroy {
       return;
     }
 
+    if (file.size > 2 * 1024 * 1024) {
+      this.avatarError.set('Image must be 2MB or smaller');
+      input.value = '';
+      return;
+    }
+
     this.avatarError.set(null);
     this.avatarFile.set(file);
 

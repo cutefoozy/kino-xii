@@ -7,6 +7,7 @@ import { RegisterModal } from './shared/register-modal/register-modal';
 import { ModalService } from './core/modal-service';
 import { AuthService } from './core/auth-service';
 import { ModalShell } from './shared/modal-shell/modal-shell';
+import { FilterOptionsService } from './core/filter-options-service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Navbar, Footer, LoginModal, RegisterModal, ModalShell],
@@ -17,5 +18,6 @@ export class App {
 
   constructor() {
     inject(AuthService).restore();
+    inject(FilterOptionsService).load();
   }
 }

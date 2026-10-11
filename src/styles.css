@@ -11,3 +11,14 @@ input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+html,
+body {
+  min-height: 100%;
+  background-color: #070C1C;
+}

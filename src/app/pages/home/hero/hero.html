@@ -29,7 +29,7 @@
         <p class="mb-[20px] max-w-[560px] text-sm leading-snug text-white">{{ m.synopsis }}</p>
 
         <div class="flex gap-[10px]">
-          <a [routerLink]="['/movies', m.id]" class="flex gap-1 h-[42px] items-center rounded-full bg-[#EC3013] px-6 text-sm font-extrabold">
+          <a [routerLink]="['/movies', m.slug]" class="flex gap-1 h-[42px] items-center rounded-full bg-[#EC3013] px-6 text-sm font-extrabold">
             <img src="Ticket.svg" alt="">
             Buy tickets
           </a>
